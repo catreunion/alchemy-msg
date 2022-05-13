@@ -1,10 +1,4 @@
-====
-
-Four quick notes on how to set up a playround for ethers.js. These are how-to guides that even first time web3 developers with front-end experience can go through in less than an hour.web3.js is almost the same.
-
-Ethers.js / web3.js is "Ethereum JavaScript API":
-
-a collection of libraries that allow you to interact with a local or remote ethereum node using HTTP, IPC or WebSocket.(via web3.js docs)
+- interact with a local or remote ethereum node using HTTP, IPC or WebSocket
 
 `yarn add ethers`
 
