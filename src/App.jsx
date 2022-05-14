@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react"
 import { ethers } from "ethers"
-// import { helloWorldContract, connectWallet, updateMessage, loadCurrentMessage, getCurrentWalletConnected } from "./utilities"
 import alchemylogo from "./alchemylogo.svg"
 import abi from "./AlchemyMsg.json"
 import "./App.css"
@@ -11,9 +10,7 @@ const App = () => {
   const [walletAddr, setWalletAddr] = useState("")
   const contractAddress = "0x893879E882763f781eB948FDB4561D02908D28aa"
   const contractABI = abi.abi
-  // const [signer, setSigner] = useState(undefined)
-  // const [status, setStatus] = useState("")
-  const [msg, setMsg] = useState("( Please connect MetaMask )")
+  const [msg, setMsg] = useState("")
   const [newMsg, setNewMsg] = useState("")
 
   useEffect(() => {
@@ -28,11 +25,11 @@ const App = () => {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
         setWalletAddr(accounts[0])
         setIsConnected(true)
-      } catch (e) {
-        console.log("cannot connect MetaMask")
+      } catch (err) {
+        console.log(err)
       }
     } else {
-      setIsConnected(false)
+      console.log("Please install MetaMask")
     }
   }
 
@@ -40,15 +37,11 @@ const App = () => {
     // const { ethereum } = window
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
+      await provider.send("eth_requestAccounts", [])
       const signer = provider.getSigner()
       const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
-
       try {
-        // console.log("fetching message...")
-        // const test = await contractInstance.getMsg()
         setMsg(await contractInstance.getMsg())
-        // console.log("message fetched:", test)
-        // setMsg(test)
       } catch (err) {
         console.log(err)
       }
@@ -60,9 +53,9 @@ const App = () => {
   const updateMessage = async () => {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
+      await provider.send("eth_requestAccounts", [])
       const signer = provider.getSigner()
       const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
-
       try {
         await contractInstance.updateMsg(newMsg)
       } catch (err) {
@@ -87,7 +80,6 @@ const App = () => {
         <h2 style={{ paddingTop: "18px" }}>New Message :</h2>
         <div>
           <input type="text" placeholder="leave your message" onChange={(e) => setNewMsg(e.target.value)} value={newMsg} />
-          {/* <p id="status">{status}</p> */}
         </div>
 
         <button id="publish" onClick={getMessage}>
@@ -102,6 +94,3 @@ const App = () => {
 }
 
 export default App
-
-// ❯ yarn hardhat run scripts/Alchemy/AlchemyMsg.js --network goerli
-// contract address: 0x893879E882763f781eB948FDB4561D02908D28aa
