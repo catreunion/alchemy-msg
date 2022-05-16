@@ -8,7 +8,7 @@ const App = () => {
   const [hasMetamask, setHasMetamask] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
   const [walletAddr, setWalletAddr] = useState("")
-  const contractAddress = "0x893879E882763f781eB948FDB4561D02908D28aa"
+  const contractAddress = "0x5E8668153F30d57036416671E5E9E23F830d51cA"
   const contractABI = abi.abi
   const [msg, setMsg] = useState("")
   const [newMsg, setNewMsg] = useState("")
