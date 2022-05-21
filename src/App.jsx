@@ -37,9 +37,8 @@ const App = () => {
     // const { ethereum } = window
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
-      await provider.send("eth_requestAccounts", [])
-      const signer = provider.getSigner()
-      const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
+      // await provider.send("eth_requestAccounts", [])
+      const contractInstance = new ethers.Contract(contractAddress, contractABI, provider)
       try {
         setMsg(await contractInstance.getMsg())
       } catch (err) {
@@ -53,11 +52,13 @@ const App = () => {
   const updateMessage = async () => {
     if (typeof window.ethereum !== "undefined") {
       const provider = new ethers.providers.Web3Provider(window.ethereum)
-      await provider.send("eth_requestAccounts", [])
+      // await provider.send("eth_requestAccounts", [])
       const signer = provider.getSigner()
       const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
       try {
-        await contractInstance.updateMsg(newMsg)
+        const tx = await contractInstance.updateMsg(newMsg)
+        await tx.wait()
+        getMessage()
       } catch (err) {
         console.log(err)
       }
@@ -71,7 +72,7 @@ const App = () => {
       <div id="container">
         <img id="logo" src={alchemylogo} alt=""></img>
         <button id="walletButton" onClick={connectWallet}>
-          {hasMetamask ? isConnected ? "Connected " + String(walletAddr).substring(0, 6) + "..." + String(walletAddr).substring(38) : <span>Connect MetaMask</span> : "Please install MetaMask"}
+          {hasMetamask ? (isConnected ? "Connected " + String(walletAddr).substring(0, 6) + "..." + String(walletAddr).substring(38) : "Connect MetaMask") : "Please install MetaMask"}
         </button>
 
         <h2 style={{ paddingTop: "50px" }}>Current Message :</h2>
