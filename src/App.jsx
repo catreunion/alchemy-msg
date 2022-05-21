@@ -25,6 +25,7 @@ const App = () => {
         const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
         setWalletAddr(accounts[0])
         setIsConnected(true)
+        getMessage()
       } catch (err) {
         console.log(err)
       }
