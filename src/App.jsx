@@ -1,3 +1,5 @@
+// https://alchemymsg.netlify.app/
+// goerli
 import React, { useState, useEffect } from "react"
 import { ethers } from "ethers"
 import alchemylogo from "./alchemylogo.svg"
