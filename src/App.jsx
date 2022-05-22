@@ -7,7 +7,7 @@ import "./App.css"
 const App = () => {
   const [hasMetamask, setHasMetamask] = useState(false)
   const [isConnected, setIsConnected] = useState(false)
-  const [walletAddr, setWalletAddr] = useState("")
+  const [myAddr, setMyAddr] = useState("")
   const contractAddress = "0x5E8668153F30d57036416671E5E9E23F830d51cA"
   const contractABI = abi.abi
   const [msg, setMsg] = useState("")
@@ -22,8 +22,8 @@ const App = () => {
   const connectWallet = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
-        const accounts = await window.ethereum.request({ method: "eth_requestAccounts" })
-        setWalletAddr(accounts[0])
+        const [account] = await window.ethereum.request({ method: "eth_requestAccounts" })
+        setMyAddr(account)
         setIsConnected(true)
         getMessage()
       } catch (err) {
@@ -35,12 +35,10 @@ const App = () => {
   }
 
   const getMessage = async () => {
-    // const { ethereum } = window
     if (typeof window.ethereum !== "undefined") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      // await provider.send("eth_requestAccounts", [])
-      const contractInstance = new ethers.Contract(contractAddress, contractABI, provider)
       try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const contractInstance = new ethers.Contract(contractAddress, contractABI, provider)
         setMsg(await contractInstance.getMsg())
       } catch (err) {
         console.log(err)
@@ -52,11 +50,10 @@ const App = () => {
 
   const updateMessage = async () => {
     if (typeof window.ethereum !== "undefined") {
-      const provider = new ethers.providers.Web3Provider(window.ethereum)
-      // await provider.send("eth_requestAccounts", [])
-      const signer = provider.getSigner()
-      const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
       try {
+        const provider = new ethers.providers.Web3Provider(window.ethereum)
+        const signer = provider.getSigner()
+        const contractInstance = new ethers.Contract(contractAddress, contractABI, signer)
         const tx = await contractInstance.updateMsg(newMsg)
         await tx.wait()
         getMessage()
@@ -73,7 +70,7 @@ const App = () => {
       <div id="container">
         <img id="logo" src={alchemylogo} alt=""></img>
         <button id="walletButton" onClick={connectWallet}>
-          {hasMetamask ? (isConnected ? "Connected " + String(walletAddr).substring(0, 6) + "..." + String(walletAddr).substring(38) : "Connect MetaMask") : "Please install MetaMask"}
+          {hasMetamask ? (isConnected ? "Connected " + String(myAddr).substring(0, 6) + "..." + String(myAddr).substring(38) : "Connect MetaMask") : "Please install MetaMask"}
         </button>
 
         <h2 style={{ paddingTop: "50px" }}>Current Message :</h2>
