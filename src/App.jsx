@@ -2,9 +2,28 @@
 // goerli
 import React, { useState, useEffect } from "react"
 import { ethers } from "ethers"
+
+import CssBaseline from "@mui/material/CssBaseline"
+import { createTheme, ThemeProvider } from "@mui/material/styles"
+import { Box, Paper, TextField, Stack } from "@mui/material"
+import LoadingButton from "@mui/lab/LoadingButton"
+import SearchIcon from "@mui/icons-material/Search"
+
 import alchemylogo from "./alchemylogo.svg"
 import abi from "./AlchemyMsg.json"
 import "./App.css"
+
+const theme = createTheme()
+
+theme.typography.h3 = {
+  fontSize: "1.2rem",
+  "@media (min-width:600px)": {
+    fontSize: "1.5rem"
+  },
+  [theme.breakpoints.up("md")]: {
+    fontSize: "2rem"
+  }
+}
 
 const App = () => {
   const [hasMetamask, setHasMetamask] = useState(false)
@@ -14,6 +33,7 @@ const App = () => {
   const contractABI = abi.abi
   const [msg, setMsg] = useState("")
   const [newMsg, setNewMsg] = useState("")
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -50,6 +70,10 @@ const App = () => {
     }
   }
 
+  const handleClick = () => {
+    setLoading(true)
+  }
+
   const updateMessage = async () => {
     if (typeof window.ethereum !== "undefined") {
       try {
@@ -59,6 +83,7 @@ const App = () => {
         const tx = await contractInstance.updateMsg(newMsg)
         await tx.wait()
         getMessage()
+        setLoading(false)
       } catch (err) {
         console.log(err)
       }
@@ -68,29 +93,52 @@ const App = () => {
   }
 
   return (
-    <div className="App">
-      <div id="container">
-        <img id="logo" src={alchemylogo} alt=""></img>
-        <button id="walletButton" onClick={connectWallet}>
-          {hasMetamask ? (isConnected ? "Connected " + String(myAddr).substring(0, 6) + "..." + String(myAddr).substring(38) : "Connect MetaMask") : "Please install MetaMask"}
-        </button>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
 
-        <h2 style={{ paddingTop: "50px" }}>Current Message :</h2>
-        <p>{msg}</p>
+      <div className="App">
+        <div id="container">
+          <img id="logo" src={alchemylogo} alt=""></img>
+          <button id="walletButton" onClick={connectWallet}>
+            {hasMetamask ? (isConnected ? "Connected " + String(myAddr).substring(0, 6) + "..." + String(myAddr).substring(38) : "Connect MetaMask") : "Please install MetaMask"}
+          </button>
 
-        <h2 style={{ paddingTop: "18px" }}>New Message :</h2>
-        <div>
-          <input type="text" placeholder="leave your message" onChange={(e) => setNewMsg(e.target.value)} value={newMsg} />
+          <h2 style={{ paddingTop: "50px" }}>Current Message :</h2>
+          <p>{msg}</p>
+
+          <h2 style={{ paddingTop: "18px" }}>New Message :</h2>
+
+          <TextField
+            onChange={(e) => {
+              setNewMsg(e.target.value)
+            }}
+            sx={{ width: 420 }}
+            id="newMsg"
+            label="leave your message"
+          />
+
+          <Stack direction="row" spacing={5} alignItems="center">
+            <button id="publish" onClick={getMessage}>
+              Get Message
+            </button>
+
+            <LoadingButton
+              loading={loading}
+              loadingPosition="start"
+              startIcon={<SearchIcon />}
+              onClick={() => {
+                handleClick()
+                updateMessage()
+              }}
+              size="large"
+              variant="contained"
+            >
+              Update Message
+            </LoadingButton>
+          </Stack>
         </div>
-
-        <button id="publish" onClick={getMessage}>
-          Get Message
-        </button>
-        <button id="publish" onClick={updateMessage}>
-          Update Message
-        </button>
       </div>
-    </div>
+    </ThemeProvider>
   )
 }
 
